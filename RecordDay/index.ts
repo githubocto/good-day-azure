@@ -78,8 +78,10 @@ const httpTrigger: AzureFunction = async function (
     return
   }
 
+  // context.log(req.body)
+  // context.log(JSON.stringify(payload))
+
   const parsedPayload = parseSlackResponse(payload)
-  context.log(parsedPayload)
 
   const owner = req.body.owner ? req.body.owner : 'githubocto'
   const repo = req.body.repo ? req.body.repo : 'good-day-demo'
