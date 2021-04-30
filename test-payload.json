@@ -1,0 +1,779 @@
+{
+	"user_id": "YOUR USER ID",
+	"view": {
+		"type": "home",
+		"blocks": [
+			{
+				"type": "header",
+				"text": {
+					"type": "plain_text",
+					"text": "Wednesday, April 16th 2021"
+				}
+			},
+			{
+				"type": "section",
+				"text": {
+					"type": "mrkdwn",
+					"text": "Hope you had a good day today! Tell us about it:"
+				}
+			},
+			{
+				"type": "divider"
+			},
+			{
+				"type": "section",
+				"block_id": "workday_quality_block",
+				"text": {
+					"type": "mrkdwn",
+					"text": ":thinking_face: *How was your workday?*"
+				},
+				"accessory": {
+					"type": "static_select",
+					"action_id": "workday_quality",
+					"placeholder": {
+						"type": "plain_text",
+						"text": "My workday was…"
+					},
+					"options": [
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":sob: Terrible"
+							},
+							"value": "0"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":slightly_frowning_face: Bad"
+							},
+							"value": "1"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":neutral_face: OK"
+							},
+							"value": "2"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":slightly_smiling_face: Good"
+							},
+							"value": "3"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":heart_eyes: Awesome!"
+							},
+							"value": "4"
+						}
+					]
+				}
+			},
+			{
+				"type": "section",
+				"block_id": "worked_with_other_people_block",
+				"text": {
+					"type": "mrkdwn",
+					"text": ":busts_in_silhouette: I worked with other people…"
+				},
+				"accessory": {
+					"type": "static_select",
+					"action_id": "worked_with_other_people",
+					"placeholder": {
+						"type": "plain_text",
+						"text": "How much?"
+					},
+					"options": [
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "None of the day"
+							},
+							"value": "0"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "A little of the day"
+							},
+							"value": "1"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Some of the day"
+							},
+							"value": "2"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Much of the day"
+							},
+							"value": "3"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Most or all of the day"
+							},
+							"value": "4"
+						}
+					]
+				}
+			},
+			{
+				"type": "section",
+				"block_id": "helped_other_people_block",
+				"text": {
+					"type": "mrkdwn",
+					"text": ":raised_hands: I helped other people…"
+				},
+				"accessory": {
+					"type": "static_select",
+					"action_id": "helped_other_people",
+					"placeholder": {
+						"type": "plain_text",
+						"text": "How much?"
+					},
+					"options": [
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "None of the day"
+							},
+							"value": "0"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "A little of the day"
+							},
+							"value": "1"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Some of the day"
+							},
+							"value": "2"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Much of the day"
+							},
+							"value": "3"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Most or all of the day"
+							},
+							"value": "4"
+						}
+					]
+				}
+			},
+			{
+				"type": "section",
+				"block_id": "interrupted_block",
+				"text": {
+					"type": "mrkdwn",
+					"text": ":rotating_light: My work was interrupted…"
+				},
+				"accessory": {
+					"type": "static_select",
+					"action_id": "interrupted",
+					"placeholder": {
+						"type": "plain_text",
+						"text": "How much?"
+					},
+					"options": [
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "None of the day"
+							},
+							"value": "0"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "A little of the day"
+							},
+							"value": "1"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Some of the day"
+							},
+							"value": "2"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Much of the day"
+							},
+							"value": "3"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Most or all of the day"
+							},
+							"value": "4"
+						}
+					]
+				}
+			},
+			{
+				"type": "section",
+				"block_id": "goals_block",
+				"text": {
+					"type": "mrkdwn",
+					"text": ":dart: I made progress towards my goals…"
+				},
+				"accessory": {
+					"type": "static_select",
+					"action_id": "goals",
+					"placeholder": {
+						"type": "plain_text",
+						"text": "How much?"
+					},
+					"options": [
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "None of the day"
+							},
+							"value": "0"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "A little of the day"
+							},
+							"value": "1"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Some of the day"
+							},
+							"value": "2"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Much of the day"
+							},
+							"value": "3"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Most or all of the day"
+							},
+							"value": "4"
+						}
+					]
+				}
+			},
+			{
+				"type": "section",
+				"block_id": "high_quality_work_block",
+				"text": {
+					"type": "mrkdwn",
+					"text": ":sparkles: I did high-quality work…"
+				},
+				"accessory": {
+					"type": "static_select",
+					"action_id": "high_quality_work",
+					"placeholder": {
+						"type": "plain_text",
+						"text": "How much?"
+					},
+					"options": [
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "None of the day"
+							},
+							"value": "0"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "A little of the day"
+							},
+							"value": "1"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Some of the day"
+							},
+							"value": "2"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Much of the day"
+							},
+							"value": "3"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Most or all of the day"
+							},
+							"value": "4"
+						}
+					]
+				}
+			},
+			{
+				"type": "section",
+				"block_id": "lot_of_work_block",
+				"text": {
+					"type": "mrkdwn",
+					"text": ":rocket: I did a lot of work…"
+				},
+				"accessory": {
+					"type": "static_select",
+					"placeholder": {
+						"type": "plain_text",
+						"text": "How much?"
+					},
+					"action_id": "lot_of_work",
+					"options": [
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "None of the day"
+							},
+							"value": "0"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "A little of the day"
+							},
+							"value": "1"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Some of the day"
+							},
+							"value": "2"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Much of the day"
+							},
+							"value": "3"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Most or all of the day"
+							},
+							"value": "4"
+						}
+					]
+				}
+			},
+			{
+				"type": "section",
+				"block_id": "breaks_block",
+				"text": {
+					"type": "mrkdwn",
+					"text": ":coffee: I took breaks today…"
+				},
+				"accessory": {
+					"type": "static_select",
+					"placeholder": {
+						"type": "plain_text",
+						"text": "How often?"
+					},
+					"action_id": "breaks",
+					"options": [
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "None of the day"
+							},
+							"value": "0"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "A little of the day"
+							},
+							"value": "1"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Some of the day"
+							},
+							"value": "2"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Much of the day"
+							},
+							"value": "3"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Most or all of the day"
+							},
+							"value": "4"
+						}
+					]
+				}
+			},
+			{
+				"type": "section",
+				"block_id": "meetings_block",
+				"text": {
+					"type": "mrkdwn",
+					"text": ":speaking_head_in_silhouette: How many meetings did you have today?"
+				},
+				"accessory": {
+					"type": "static_select",
+					"placeholder": {
+						"type": "plain_text",
+						"text": "How many?"
+					},
+					"action_id": "meetings",
+					"options": [
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "None"
+							},
+							"value": "0"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "1"
+							},
+							"value": "1"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "2"
+							},
+							"value": "2"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "3–4"
+							},
+							"value": "3"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "5 or more"
+							},
+							"value": "4"
+						}
+					]
+				}
+			},
+			{
+				"type": "section",
+				"block_id": "emotions_block",
+				"text": {
+					"type": "mrkdwn",
+					"text": ":thought_balloon: How do you feel about your workday?"
+				},
+				"accessory": {
+					"type": "static_select",
+					"placeholder": {
+						"type": "plain_text",
+						"text": "I feel…"
+					},
+					"action_id": "emotions",
+					"options": [
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":grimacing: Tense or nervous"
+							},
+							"value": "0"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":worried: Stressed or upset"
+							},
+							"value": "1"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":cry: Sad or depressed"
+							},
+							"value": "2"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":yawning_face: Bored"
+							},
+							"value": "3"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":relaxed: Calm or relaxed"
+							},
+							"value": "4"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":relieved: Serene or content"
+							},
+							"value": "4"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":slightly_smiling_face: Happy or elated"
+							},
+							"value": "5"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":grinning: Excited or alert"
+							},
+							"value": "6"
+						}
+					]
+				}
+			},
+			{
+				"type": "section",
+				"block_id": "most_productive_block",
+				"text": {
+					"type": "mrkdwn",
+					"text": ":chart_with_upwards_trend: Today, I felt *most* productive:"
+				},
+				"accessory": {
+					"type": "static_select",
+					"placeholder": {
+						"type": "plain_text",
+						"text": "When?"
+					},
+					"action_id": "most_productive",
+					"options": [
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":sunrise: In the morning (9:00–11:00)"
+							},
+							"value": "0"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":clock12: Mid-day (11:00-13:00)"
+							},
+							"value": "1"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":clock2: Early afternoon (13:00-15:00)"
+							},
+							"value": "2"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":clock5: Late afternoon (15:00-17:00)"
+							},
+							"value": "3"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":night_with_stars: Outside of typical work hours"
+							},
+							"value": "4"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":date: Equally throughout the day"
+							},
+							"value": "5"
+						}
+					]
+				}
+			},
+			{
+				"type": "section",
+				"block_id": "least_productive_block",
+				"text": {
+					"type": "mrkdwn",
+					"text": ":chart_with_downwards_trend: Today, I felt *least* productive:"
+				},
+				"accessory": {
+					"type": "static_select",
+					"placeholder": {
+						"type": "plain_text",
+						"text": "When?"
+					},
+					"action_id": "least_productive",
+					"options": [
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":sunrise: In the morning (9:00–11:00)"
+							},
+							"value": "0"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":clock12: Mid-day (11:00-13:00)"
+							},
+							"value": "1"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":clock2: Early afternoon (13:00-15:00)"
+							},
+							"value": "2"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":clock5: Late afternoon (15:00-17:00)"
+							},
+							"value": "3"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":night_with_stars: Outside of typical work hours"
+							},
+							"value": "4"
+						},
+						{
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": ":date: Equally throughout the day"
+							},
+							"value": "5"
+						}
+					]
+				}
+			},
+			{
+				"type": "divider"
+			},
+			{
+				"type": "actions",
+				"elements": [
+					{
+						"type": "button",
+						"text": {
+							"type": "plain_text",
+							"emoji": true,
+							"text": "Save my response"
+						},
+						"action_id": "record_day",
+						"value": "2021-04-21|idan|repo"
+					}
+				]
+			}
+		]
+	}
+}

@@ -1,6 +1,9 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions"
 import { Octokit } from "@octokit/rest"
 import { GetResponseTypeFromEndpointMethod, GetResponseDataTypeFromEndpointMethod } from "@octokit/types";
+import * as querystring from "querystring"
+import { isButtonSubmit, parseSlackResponse } from './slack'
+import { BlockAction } from '@slack/bolt';
 
 const key = process.env["GH_API_KEY"]
 if (typeof key === "undefined") {
@@ -26,14 +29,11 @@ interface ContentResponse {
 
 const getContent = async function (owner: string, repo: string, path: string): Promise<ContentResponse> | null {
   try {
-    console.log("trying response")
     let response = await octokit.repos.getContent({
       owner,
       repo,
       path,
     })
-
-    console.log("after response")
 
     const data: GetContentResponseDataType = response.data
 
@@ -60,16 +60,30 @@ const httpTrigger: AzureFunction = async function (
   req: HttpRequest
 ): Promise<void> {
   
-  const owner = req.body.owner
-  const repo = req.body.repo
-  const path = req.body.path
-  const payload = req.body.payload
-  if (!["owner", "repo", "path", "payload"].every((k) => k in req.body)) {
+  const body = querystring.parse(req.body)
+  
+  if (Array.isArray(body.payload)) {
+    throw new Error(
+      `malformed payload`
+    )
+  }
+
+  const payload = JSON.parse(body.payload) as BlockAction
+  const isSubmitButton = isButtonSubmit(payload)
+
+  if (!isSubmitButton) {
     context.res = {
-      status: 422,
+      status: 200,
     }
     return
   }
+
+  const parsedPayload = parseSlackResponse(payload)
+  context.log(parsedPayload)
+
+  const owner = req.body.owner ? req.body.owner : 'githubocto'
+  const repo = req.body.repo ? req.body.repo : 'good-day-demo'
+  const path = req.body.path ? req.body.path : 'good-day.csv'
 
   let file: ContentResponse
   try {
@@ -85,10 +99,10 @@ const httpTrigger: AzureFunction = async function (
   let fileProps =
     file === null
       ? {
-          content: Buffer.from(headerRow + payload + "\n").toString("base64"),
+          content: Buffer.from(headerRow + parsedPayload + "\n").toString("base64"),
         }
       : {
-          content: Buffer.from(file.content + "\n" + payload).toString("base64"),
+          content: Buffer.from(file.content + "\n" + parsedPayload).toString("base64"),
           sha: file.sha,
         }
   const { data } = await octokit.repos.createOrUpdateFileContents({
