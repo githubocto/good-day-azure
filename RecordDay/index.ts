@@ -1,5 +1,57 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions"
 import { Octokit } from "@octokit/rest"
+import { GetResponseTypeFromEndpointMethod, GetResponseDataTypeFromEndpointMethod } from "@octokit/types";
+
+const key = process.env["GH_API_KEY"]
+if (typeof key === "undefined") {
+  throw new Error(
+    `need a valid github API key`
+  )
+}
+const octokit = new Octokit({
+  auth: key
+})
+
+type GetContentResponseType = GetResponseTypeFromEndpointMethod<
+  typeof octokit.repos.getContent
+>;
+type GetContentResponseDataType = GetResponseDataTypeFromEndpointMethod<
+  typeof octokit.repos.getContent
+>;
+
+interface ContentResponse {
+  content: string
+  sha: string
+}
+
+const getContent = async function (owner: string, repo: string, path: string): Promise<ContentResponse> | null {
+  try {
+    console.log("trying response")
+    let response = await octokit.repos.getContent({
+      owner,
+      repo,
+      path,
+    })
+
+    console.log("after response")
+
+    const data: GetContentResponseDataType = response.data
+
+    if (Array.isArray(data)) {
+      throw new Error(
+        `path "${path}" returned an array, maybe it's a directory and not a CSV?`
+      )
+    }
+
+    const sha = data.sha
+    // @ts-ignore
+    const content = Buffer.from(data.content || "", "base64").toString("utf8")
+
+    return { content, sha }
+  } catch (error) {
+    return null
+  }
+}
 
 const headerRow = 'date,foo,bar,baz\n'
 
@@ -7,17 +59,7 @@ const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
 ): Promise<void> {
-  const key = process.env["GH_API_KEY"]
-  if (typeof key === "undefined") {
-    context.res = {
-      status: 500,
-    }
-    return
-  }
-  const o = new Octokit({
-    auth: key,
-  })
-
+  
   const owner = req.body.owner
   const repo = req.body.repo
   const path = req.body.path
@@ -29,39 +71,9 @@ const httpTrigger: AzureFunction = async function (
     return
   }
 
-  const getFile = async (
-    path
-  ): Promise<{ sha: string; content: string } | null> => {
-    let response
-    try {
-      response = await o.repos.getContent({
-        owner,
-        repo,
-        path,
-      })
-    } catch (error) {
-      return null
-    }
-
-    const data = response.data
-    if (Array.isArray(data)) {
-      // the path was pointed to a directory, not a CSV file
-      // complain and die
-      throw new Error(
-        `path "${path}" returned an array, maybe it's a directory and not a CSV?`
-      )
-    }
-
-    return {
-      sha: data.sha as string,
-      // @ts-ignore
-      content: Buffer.from(data.content || "", "base64").toString("utf8"),
-    }
-  }
-
-  let file
+  let file: ContentResponse
   try {
-    file = await getFile(path)
+    file = await getContent(owner, repo, path)
   } catch (err) {
     context.res = {
       body: (err as Error).message,
@@ -69,17 +81,17 @@ const httpTrigger: AzureFunction = async function (
     }
     return
   }
-
+  
   let fileProps =
     file === null
       ? {
           content: Buffer.from(headerRow + payload + "\n").toString("base64"),
         }
       : {
-          content: Buffer.from(file.content + payload).toString("base64"),
+          content: Buffer.from(file.content + "\n" + payload).toString("base64"),
           sha: file.sha,
         }
-  const { data } = await o.repos.createOrUpdateFileContents({
+  const { data } = await octokit.repos.createOrUpdateFileContents({
     owner,
     repo,
     path,
