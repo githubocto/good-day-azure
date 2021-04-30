@@ -53,8 +53,6 @@ const getContent = async function (owner: string, repo: string, path: string): P
   }
 }
 
-const headerRow = 'date,foo,bar,baz\n'
-
 const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
@@ -81,8 +79,6 @@ const httpTrigger: AzureFunction = async function (
   // context.log(req.body)
   // context.log(JSON.stringify(payload))
 
-  const parsedPayload = parseSlackResponse(payload)
-
   const owner = req.body.owner ? req.body.owner : 'githubocto'
   const repo = req.body.repo ? req.body.repo : 'good-day-demo'
   const path = req.body.path ? req.body.path : 'good-day.csv'
@@ -97,11 +93,20 @@ const httpTrigger: AzureFunction = async function (
     }
     return
   }
+
+  let parsedPayload
+  if (file) {
+    // if file already exists we don't want to write headers
+    parsedPayload = parseSlackResponse(payload)
+  } else {
+    // if a new file we want to write headeres to the file
+    parsedPayload = parseSlackResponse(payload, true)
+  }
   
   let fileProps =
     file === null
       ? {
-          content: Buffer.from(headerRow + parsedPayload + "\n").toString("base64"),
+          content: Buffer.from(parsedPayload + "\n").toString("base64"),
         }
       : {
           content: Buffer.from(file.content + "\n" + parsedPayload).toString("base64"),

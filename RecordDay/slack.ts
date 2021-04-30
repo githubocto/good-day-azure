@@ -1,7 +1,7 @@
 import { BlockAction, ContextMissingPropertyError } from '@slack/bolt';
 
 // TODO: Create a type for our payload once we decide on parameters
-export const parseSlackResponse = (payload: BlockAction) => {
+export const parseSlackResponse = (payload: BlockAction, newFile = false) => {
     const options = slackOptions(payload)
     const state = payload.view.state.values
 
@@ -18,9 +18,11 @@ export const parseSlackResponse = (payload: BlockAction) => {
         parsedResponseBody += optionText + ','
     }
 
-    const response = parsedResponseHeader + '\n' + parsedResponseBody
+    if (newFile) {
+        return parsedResponseHeader + '\n' + parsedResponseBody
+    }
 
-    return response;
+    return parsedResponseBody;
 };
 
 const slackOptions = (payload: BlockAction) => {
