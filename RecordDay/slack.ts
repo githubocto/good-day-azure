@@ -25,6 +25,7 @@ export const parseSlackResponse = (payload: BlockAction, newFile = false) => {
     return parsedResponseBody;
 };
 
+// TODO: Decide if we want to fill these functions at runtime of each function or presave some kind of state
 const slackOptions = (payload: BlockAction) => {
     const blocks = payload.view.blocks
 

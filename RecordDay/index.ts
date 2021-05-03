@@ -44,10 +44,10 @@ const getContent = async function (owner: string, repo: string, path: string): P
     }
 
     const sha = data.sha
-    // @ts-ignore
-    const content = Buffer.from(data.content || "", "base64").toString("utf8")
-
-    return { content, sha }
+    const content = 'content' in data ? data.content : ''
+    const contentBuffer = Buffer.from(content, "base64").toString("utf8")
+    
+    return { content: contentBuffer, sha }
   } catch (error) {
     return null
   }
