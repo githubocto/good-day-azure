@@ -31,15 +31,16 @@ const timerTrigger: AzureFunction = async function (
   `
 
   try {
-    const { rows: users } = await pool.query(usersToPromptQuery)
-    await Promise.all(
-      users.map(async (user) => {
-        console.log("Notifying", user)
-        await axios.post(`${SLACKBOT_API_URL}/notify`, {
-          user_id: user.slackid,
-        })
+    const { rows: users = [] } = await pool.query(usersToPromptQuery)
+
+    const notifyPromises = users.map((user) => {
+      console.log("Notifying", user.slackid)
+      return axios.post(`${SLACKBOT_API_URL}/notify`, {
+        user_id: user.slackid,
       })
-    )
+    })
+
+    await Promise.all(notifyPromises)
 
     context.res = {
       status: 200,
