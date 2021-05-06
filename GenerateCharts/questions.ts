@@ -151,6 +151,14 @@ export const questions = [
   },
 ].map((d) => ({
   ...d,
-  titleWithEmoji: emoji.replace_colons(d.title),
-  optionsWithEmoji: d.options.map((option) => emoji.replace_colons(option)),
+  titleWithEmoji: emoji.replace_colons(d.title).replace(/,/g, ""),
+  optionsWithEmoji: d.options.map((option) =>
+    emoji.replace_colons(option).replace(/,/g, "")
+  ),
 }))
+
+let questionMap = {}
+questions.forEach((question) => {
+  questionMap[question.id] = question
+})
+export { questionMap }

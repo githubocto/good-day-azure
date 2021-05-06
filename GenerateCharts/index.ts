@@ -1,16 +1,20 @@
 import axios from "axios"
 import { AzureFunction, Context } from "@azure/functions"
 import { Pool } from "pg"
-import fs from "fs"
-import { createCanvas } from "canvas"
-import { Chart } from "chart.js"
 import * as d3 from "d3"
 import { Octokit } from "@octokit/rest"
-import { questions } from "./questions"
+import { questions, questionMap } from "./questions"
+import { generateTimelineForField, generateTimeOfDayChart } from "./charts"
 
 const PG_CONN_STRING = process.env.PG_CONN_STRING
 const SLACKBOT_API_URL = process.env.SLACKBOT_API_URL
 const GH_API_KEY = process.env.GH_API_KEY
+const githubCommitter = {
+  "committer.name": "Good Day Bot",
+  "committer.email": "octo-devex+goodday@github.com",
+  "author.name": "Good Day Bot",
+  "author.email": "octo-devex+goodday@github.com",
+}
 
 const pool = new Pool({
   connectionString: PG_CONN_STRING,
@@ -32,7 +36,7 @@ const fields = questions.map(({ title }) => title)
 
 export type FormResponseField = typeof fields[number]
 
-export type FormResponse = Record<FormResponseField | "date", string>
+export type FormResponse = Record<FormResponseField | "date", string | Date>
 
 export type User = {
   ghrepo: string
@@ -66,122 +70,27 @@ const getDataForUser = async (user: User) => {
   return data
 }
 
-const timelineWidth = 1200
-const timelineHeight = 350
-const generateTimelineForField = async (
+const createCharts = async (
   data: FormResponse[],
-  field: FormResponseField,
-  index: number
+  startOfWeek: Date,
+  endOfWeek: Date
 ) => {
-  const width = timelineWidth
-  const height = timelineHeight
-
-  const startDate = new Date(data[0].date)
-
-  const question = questions.find((q) => q.titleWithEmoji === field)
-  if (question === undefined) return
-
-  const { optionsWithEmoji: options } = question
-
-  const config = {
-    type: "line",
-    data: {
-      labels: data.map((d) => d3.timeFormat("%A")(new Date(d.date))),
-      datasets: [
-        {
-          label: field,
-          borderColor: "rgb(69, 174, 177)",
-          backgroundColor: "rgba(69, 174, 177, 0.1)",
-          pointBackgroundColor: "rgba(69, 174, 177, 1)",
-          pointRadius: 5,
-          data: data.map((d) => {
-            const optionIndex = options.indexOf(d[field])
-            if (optionIndex === -1) return undefined
-            return optionIndex
-          }),
-        },
-      ],
-    },
-    options: {
-      responsive: false,
-      animation: false,
-      plugins: {
-        title: {
-          display: true,
-          padding: {
-            bottom: 26,
-          },
-          font: {
-            weight: 900,
-          },
-          text: `${field.replace(/_/g, " ")} (week of ${d3.timeFormat(
-            "%B %-d, %Y"
-          )(startDate)})`,
-        },
-        legend: {
-          display: false,
-        },
-      },
-      layout: {
-        padding: { top: 30, right: 50, bottom: 30, left: 50 },
-      },
-      scales: {
-        y: {
-          min: 0,
-          max: options.length,
-          stepSize: 1,
-          ticks: {
-            callback: (value) => options[value],
-          },
-        },
-      },
-    },
-    plugins: [
-      {
-        beforeDraw: (chart) => {
-          const ctx = chart.canvas.getContext("2d")
-          ctx.fillStyle = "white"
-          ctx.fillRect(0, 0, chart.width, chart.height)
-        },
-      },
-    ],
-  }
-
-  const canvas = createCanvas(width, height)
-
-  Chart.defaults.font = {
-    family: "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
-    style: "normal",
-    size: 18,
-    lineHeight: 1.2,
-    weight: "500",
-  }
-
-  // @ts-ignore
-  const chart = new Chart(canvas, config)
-
-  let imageData = canvas.toDataURL("image/png")
-  imageData = imageData.replace(/^data:image\/\w+;base64,/, "")
-
-  const filename = `/tmp/timeline-${index}.png`
-  await fs.writeFile(filename, imageData, { encoding: "base64" }, (e) => {
-    // console.log(e);
-  })
-
-  return imageData
-}
-
-const generateTimeOfDayChart = async (data: FormResponse[]) => {}
-
-const createCharts = async (data: FormResponse[]) => {
   const [date, ...fields] = Object.keys(data[0]).filter(Boolean)
   const fieldTimelinesPromises = fields.map((field, i) =>
-    generateTimelineForField(data, field, i)
+    generateTimelineForField(data, field, startOfWeek, endOfWeek)
   )
   const fieldTimelines = await Promise.all(fieldTimelinesPromises)
-  const timeOfDayChart = generateTimeOfDayChart(data)
+  const timeOfDayChart = await generateTimeOfDayChart(
+    data,
+    startOfWeek,
+    endOfWeek
+  )
 
   return [
+    {
+      image: timeOfDayChart,
+      filename: "time-of-day.png",
+    },
     ...fieldTimelines.filter(Boolean).map((timeline, i) => ({
       image: timeline,
       filename: `timeline-${i}.png`,
@@ -204,7 +113,12 @@ const getSha = async (filename: string, user: User) => {
     return undefined
   }
 }
-const saveImageToRepo = async (images: Image[], user: User) => {
+const saveImageToRepo = async (
+  data: FormResponse[],
+  images: Image[],
+  user: User,
+  startOfWeek: Date
+) => {
   console.log(
     `Saving charts to ${user.ghuser}/${user.ghrepo} for ${user.slackid}`
   )
@@ -223,19 +137,40 @@ const saveImageToRepo = async (images: Image[], user: User) => {
       sha,
       content: image.image,
       message: "Update summary visualization",
-      "committer.name": "Good Day Bot",
-      "committer.email": "octo-devex+goodday@github.com",
-      "author.name": "Good Day Bot",
-      "author.email": "octo-devex+goodday@github.com",
+      ...githubCommitter,
     })
   }
 
   const readmeSha = await getSha("/README.md", user)
 
-  const readmeContents = `
-  # Good Day
+  const totalDays = data.length
+  let numberOfGoodDays = 0
+  let numberOfBadDays = 0
+  data.forEach((d) => {
+    const question = questionMap["workday_quality"]
+    const response = d[question.titleWithEmoji]
+    const optionIndex = question.optionsWithEmoji.indexOf(response)
+    if (optionIndex > 2) {
+      numberOfGoodDays++
+    } else {
+      numberOfBadDays++
+    }
+  })
 
-  ## Latest summary
+  const readmeContents = `
+  # The Good Day Project
+
+  ## This week's summary (week of ${d3.timeFormat("%B %-d, %Y")(startOfWeek)})
+
+  You logged ${totalDays} days this week. ${totalDays > 3 ? "Great job!" : ""}
+
+  ☀️ **${numberOfGoodDays}** were Good days (${d3.format(".0%")(
+    numberOfGoodDays / totalDays
+  )}). *These are days you rated as Awesome or Good*
+
+  🌧 **${numberOfBadDays}** were Not-so-good days (${d3.format(".0%")(
+    numberOfBadDays / totalDays
+  )}). *These are days you rated as OK, Bad, or Terrible*
 
   ${images.map(({ filename }) => `![Image](${filename})`).join("\n")}
   `
@@ -250,10 +185,7 @@ const saveImageToRepo = async (images: Image[], user: User) => {
     sha: readmeSha,
     content: readmeContentsString,
     message: "Update README",
-    "committer.name": "Good Day Bot",
-    "committer.email": "octo-devex+goodday@github.com",
-    "author.name": "Good Day Bot",
-    "author.email": "octo-devex+goodday@github.com",
+    ...githubCommitter,
   })
 }
 
@@ -264,6 +196,8 @@ const notifyUser = async (user: User) => {
   })
 }
 
+const convertDateToTimezone = (date, timezone: string) =>
+  new Date(date.toLocaleString("en-US", { timeZone: timezone }))
 const createChartsForUser = async (user: User): Promise<void> | null => {
   console.log(`Creating charts for ${user.slackid}`)
   const data = await getDataForUser(user)
@@ -272,9 +206,26 @@ const createChartsForUser = async (user: User): Promise<void> | null => {
     console.log("No data found for ", user.slackid)
     return
   }
+  const now = convertDateToTimezone(new Date(), user.timezone)
+  const lastWeek = d3.timeWeek.offset(now, -1)
+  const startOfWeek = d3.timeWeek.floor(lastWeek)
+  const endOfWeek = d3.timeWeek.ceil(lastWeek)
+  const thisWeeksData = data
+    .filter(
+      ({ date }) => new Date(date) > startOfWeek && new Date(date) < endOfWeek
+    )
+    .map((d) => ({
+      ...d,
+      date: convertDateToTimezone(new Date(d.date), user.timezone),
+    }))
 
-  const images = await createCharts(data.slice(0, 7))
-  await saveImageToRepo(images, user)
+  if (!thisWeeksData.length) {
+    console.log("No days recorded this week for ", user.slackid)
+    return
+  }
+
+  const images = await createCharts(thisWeeksData, startOfWeek, endOfWeek)
+  await saveImageToRepo(thisWeeksData, images, user, startOfWeek)
   await notifyUser(user)
 }
 
