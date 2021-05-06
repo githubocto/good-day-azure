@@ -188,12 +188,14 @@ export const generateTimeOfDayChart = async (
       },
       scales: {
         x: {
-          min: 1,
-          max: 5,
+          min: 0.5,
+          max: 5.5,
           ticks: {
-            maxTicksLimit: 5,
-            callback: (value) =>
-              d3.timeFormat("%A")(d3.timeDay.offset(startOfWeek, value)),
+            stepSize: 0.5,
+            callback: (value, i) => {
+              if (value !== Math.floor(value)) return ""
+              return d3.timeFormat("%A")(d3.timeDay.offset(startOfWeek, value))
+            },
           },
         },
         y: {

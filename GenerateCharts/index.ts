@@ -172,7 +172,18 @@ const saveImageToRepo = async (
     numberOfBadDays / totalDays
   )}). *These are days you rated as OK, Bad, or Terrible*
 
-  ${images.map(({ filename }) => `![Image](${filename})`).join("\n")}
+  Let's take a look at the data you logged for this week.
+
+  ## Do you have a typical time of day that feels productive?
+
+  ![Image](${images[0].filename})
+
+  ## How you answered each question
+
+  ${images
+    .slice(1)
+    .map(({ filename }) => `![Image](${filename})`)
+    .join("\n")}
   `
 
   const readmeContentsBuffer = Buffer.from(readmeContents)
