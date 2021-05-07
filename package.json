@@ -20,7 +20,8 @@
     "d3": "^6.7.0",
     "emoji-js": "^3.5.0",
     "pg": "^8.6.0",
-    "querystring": "^0.2.1"
+    "querystring": "^0.2.1",
+    "vega": "^5.20.2"
   },
   "devDependencies": {
     "@azure/functions": "^1.2.3",
