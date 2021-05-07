@@ -144,6 +144,19 @@ const saveImageToRepo = async (
   const readmeSha = await getSha("/README.md", user)
 
   const totalDays = data.length
+  const workdayQualityQuestion = questionMap["workday_quality"]
+  const averageScore =
+    data
+      .map(
+        (q) =>
+          +workdayQualityQuestion.optionsWithEmoji.indexOf(
+            q[workdayQualityQuestion.titleWithEmoji]
+          )
+      )
+      .filter((d) => typeof d === "number")
+      .reduce((a, b) => a + b, 0) / totalDays
+  const averageScoreString =
+    workdayQualityQuestion.optionsWithEmoji[Math.round(averageScore)]
   let numberOfGoodDays = 0
   let numberOfBadDays = 0
   data.forEach((d) => {
@@ -160,7 +173,7 @@ const saveImageToRepo = async (
   const readmeContents = `
   # The Good Day Project
 
-  ## This week's summary (week of ${d3.timeFormat("%B %-d, %Y")(startOfWeek)})
+  ## Week of ${d3.timeFormat("%B %-d, %Y")(startOfWeek)} summary
 
   You logged ${totalDays} days this week. ${totalDays > 3 ? "Great job!" : ""}
 
@@ -172,13 +185,21 @@ const saveImageToRepo = async (
     numberOfBadDays / totalDays
   )}). *These are days you rated as OK, Bad, or Terrible*
 
+  On average, your workdays were ${averageScoreString}.
+
   Let's take a look at the data you logged for this week.
 
   ## Do you have a typical time of day that feels productive?
 
+  First, let's look at which parts of the day you were most and least productive. If there's a clear pattern, could you optimize your schedule to work with your natural productivity?
+
   ![Image](${images[0].filename})
 
   ## How you answered each question
+
+  Let's look at how you responeded to each question over the week.
+
+  Is there any relationship to how you answered the first *How was your workday* question? We colored the background of each day with your response - red for not-so-good days and green for great days.
 
   ${images
     .slice(1)
@@ -237,7 +258,7 @@ const createChartsForUser = async (user: User): Promise<void> | null => {
 
   const images = await createCharts(thisWeeksData, startOfWeek, endOfWeek)
   await saveImageToRepo(thisWeeksData, images, user, startOfWeek)
-  await notifyUser(user)
+  // await notifyUser(user)
 }
 
 const createChartsForUsers: AzureFunction = async function (
