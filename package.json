@@ -2,6 +2,7 @@
   "name": "good-day",
   "version": "1.0.0",
   "description": "",
+  "author": "GitHub OCTO",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
