@@ -21,6 +21,6 @@ For local dev:
 
 3. In VSCode go to the Debug panel and click on `Attach to Node Functions` then select the Azure storage account to use for debugging `octogooddaystorage`.
 
-4. `yarn install`
+4. `npm install`
 
-5. `yarn watch` and `yarn start` in another tab
+5. `npm run watch` and `npm run start` in another tab
