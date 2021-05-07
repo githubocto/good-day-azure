@@ -9,9 +9,15 @@ For local dev:
 {
   "IsEncrypted": false,
   "Values": {
-    "AzureWebJobsStorage": "",
+    "AzureWebJobsStorage": "", // get automatically from VSCode Debug panel
     "FUNCTIONS_WORKER_RUNTIME": "node",
-    "GH_API_KEY": "YOUR PAT GOES HERE"
+    "GH_API_KEY": "YOUR PAT GOES HERE", // get from good-day-bot account on GitHub
+    "PG_CONN_STRING": "", // get from 1 password using table goodday
+    "SLACKBOT_API_URL": "https://octo-devex.ngrok.io" or "https://octo-good-day-bot.azurewebsites.net/"
   }
 }
 ```
+
+1. In VSCode go to the Debug panel and click on `Attach to Node Functions` then select the Azure storage account to use for debugging `octogooddaystorage`.
+
+2. `npm run watch` and `npm run start` in another tab
