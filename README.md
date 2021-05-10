@@ -31,7 +31,9 @@ Good Day is a Slack bot that pings users every day and asks how their day was. I
 
 ## Building / Releasing
 
-We are using the `Azure Functions` VSCode extension to deploy to Azure.
+Deployment to the production app happens automatically when pushing to main by using a GitHub Action specified in `.github/workflows/good-day.yaml`.
+
+Or use the [Azure Functions](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions) for dev testing work.
 
 ## License
 
