@@ -4,7 +4,11 @@ import { Pool } from "pg"
 import * as d3 from "d3"
 import { Octokit } from "@octokit/rest"
 import { questions, questionMap } from "./questions"
-import { generateTimelineForField, generateTimeOfDayChart } from "./charts"
+import {
+  generateTimelineForField,
+  generateTimeOfDayChart,
+  generateAmountOfDayChart,
+} from "./charts"
 
 const PG_CONN_STRING = process.env.PG_CONN_STRING
 const SLACKBOT_API_URL = process.env.SLACKBOT_API_URL
@@ -54,20 +58,25 @@ const getDataForUser = async (user: User) => {
   const repo = user.ghrepo || "good-day-demo"
   const path = "good-day.csv"
 
-  const response = await octokit.repos.getContent({
-    owner,
-    repo,
-    path,
-  })
+  try {
+    const response = await octokit.repos.getContent({
+      owner,
+      repo,
+      path,
+    })
 
-  const res = response.data
-  const content = "content" in res ? res.content : ""
+    const res = response.data
+    const content = "content" in res ? res.content : ""
 
-  if (!content) return []
-  const contentBuffer = Buffer.from(content, "base64").toString("utf8")
-  const data = d3.csvParse(contentBuffer)
+    if (!content) return []
+    const contentBuffer = Buffer.from(content, "base64").toString("utf8")
+    const data = d3.csvParse(contentBuffer)
 
-  return data
+    return data
+  } catch (e) {
+    console.log(e)
+    return undefined
+  }
 }
 
 const createCharts = async (
@@ -75,11 +84,17 @@ const createCharts = async (
   startOfWeek: Date,
   endOfWeek: Date
 ) => {
+  console.log(`Rendering charts`)
   const [date, ...fields] = Object.keys(data[0]).filter(Boolean)
   const fieldTimelinesPromises = fields.map((field, i) =>
     generateTimelineForField(data, field, startOfWeek, endOfWeek)
   )
   const fieldTimelines = await Promise.all(fieldTimelinesPromises)
+  const amountOfDayChart = await generateAmountOfDayChart(
+    data,
+    startOfWeek,
+    endOfWeek
+  )
   const timeOfDayChart = await generateTimeOfDayChart(
     data,
     startOfWeek,
@@ -90,6 +105,10 @@ const createCharts = async (
     {
       image: timeOfDayChart,
       filename: "time-of-day.png",
+    },
+    {
+      image: amountOfDayChart,
+      filename: "amount-of-day.png",
     },
     ...fieldTimelines.filter(Boolean).map((timeline, i) => ({
       image: timeline,
@@ -258,7 +277,7 @@ const createChartsForUser = async (user: User): Promise<void> | null => {
 
   const images = await createCharts(thisWeeksData, startOfWeek, endOfWeek)
   await saveImageToRepo(thisWeeksData, images, user, startOfWeek)
-  // await notifyUser(user)
+  await notifyUser(user)
 }
 
 const createChartsForUsers: AzureFunction = async function (
