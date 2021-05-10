@@ -1,7 +1,7 @@
 {
   "name": "good-day",
   "version": "1.0.0",
-  "description": "",
+  "description": "Azure functions for the Good Day Slack bot",
   "author": "GitHub OCTO",
   "scripts": {
     "build": "tsc",
