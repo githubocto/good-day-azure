@@ -10,7 +10,7 @@ Good Day is a Slack bot that pings users every day and asks how their day was. I
 
 2. Create a `local.settings.json` with the following content:
 
-```json
+```jsonc
 {
   "IsEncrypted": false,
   "Values": {
