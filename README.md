@@ -4,7 +4,7 @@ Full writeup for this project is here: [https://github.com/githubocto/good-day-b
 
 Good Day is a Slack bot that pings users every day and asks how their day was. It depends on these Azure functions for cron job tasks.
 
-# Development
+## Development
 
 1. `brew tap azure/functions && brew install azure-functions-core-tools@3`
 
@@ -29,6 +29,10 @@ Good Day is a Slack bot that pings users every day and asks how their day was. I
 
 5. `npm run watch` and `npm run start` in another tab
 
-# Building / Releasing
+## Building / Releasing
 
 We are using the `Azure Functions` VSCode extension to deploy to Azure.
+
+## License
+
+[MIT](LICENSE)
