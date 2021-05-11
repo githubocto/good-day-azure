@@ -35,6 +35,8 @@ Deployment to the production app happens automatically when pushing to main by u
 
 Or use the [Azure Functions](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions) for dev testing work.
 
+In both cases you also have to set the `env` variables for the Azure app through the app's configuration panel.
+
 ## License
 
 [MIT](LICENSE)
