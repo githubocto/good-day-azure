@@ -28,12 +28,14 @@ const timerTrigger: AzureFunction = async function (
 	  users
   WHERE
 	  extract(hour from now() at time zone timezone) = extract(hour FROM TO_TIMESTAMP(prompt_time, 'HH24:MI'))
+  AND NOT
+    is_unsubscribed is TRUE
   `
 
   try {
-    context.log("Users to prompt");
-    const { rows: users = [] } = await pool.query(usersToPromptQuery);
-    context.log(users);
+    context.log("Users to prompt")
+    const { rows: users = [] } = await pool.query(usersToPromptQuery)
+    context.log(users)
 
     const notifyPromises = users.map((user) => {
       context.log("Notifying", user.slackid)

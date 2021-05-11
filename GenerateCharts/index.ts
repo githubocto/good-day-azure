@@ -303,7 +303,7 @@ const createChartsForUsers: AzureFunction = async function (
 
   context.log("Charts generation function ran!", timeStamp)
 
-  const usersQuery = `SELECT * FROM users`
+  const usersQuery = `SELECT * FROM users WHERE NOT is_unsubscribed is TRUE`
 
   try {
     const { rows: users = [] } = await pool.query(usersQuery)
