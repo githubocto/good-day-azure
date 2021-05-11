@@ -85,17 +85,17 @@ const createCharts = async (
   endOfWeek: Date
 ) => {
   console.log(`Rendering charts`)
-  const [date, ...fields] = Object.keys(data[0]).filter(Boolean)
-  const fieldTimelinesPromises = fields.map((field, i) =>
-    generateTimelineForField(data, field, startOfWeek, endOfWeek)
-  )
-  const fieldTimelines = await Promise.all(fieldTimelinesPromises)
-  const amountOfDayChart = await generateAmountOfDayChart(
+  // const [date, ...fields] = Object.keys(data[0]).filter(Boolean)
+  // const fieldTimelinesPromises = fields.map((field, i) =>
+  //   generateTimelineForField(data, field, startOfWeek, endOfWeek)
+  // )
+  // const fieldTimelines = await Promise.all(fieldTimelinesPromises)
+  const timeOfDayChart = await generateTimeOfDayChart(
     data,
     startOfWeek,
     endOfWeek
   )
-  const timeOfDayChart = await generateTimeOfDayChart(
+  const amountOfDayChart = await generateAmountOfDayChart(
     data,
     startOfWeek,
     endOfWeek
@@ -103,17 +103,13 @@ const createCharts = async (
 
   return [
     {
-      image: timeOfDayChart,
-      filename: "time-of-day.png",
+      image: amountOfDayChart,
+      filename: "charts/amount-of-day.png",
     },
     {
-      image: amountOfDayChart,
-      filename: "amount-of-day.png",
+      image: timeOfDayChart,
+      filename: "charts/time-of-day.png",
     },
-    ...fieldTimelines.filter(Boolean).map((timeline, i) => ({
-      image: timeline,
-      filename: `timeline-${i}.png`,
-    })),
   ]
 }
 
@@ -132,7 +128,7 @@ const getSha = async (filename: string, user: User) => {
     return undefined
   }
 }
-const saveImageToRepo = async (
+const saveImagesToRepo = async (
   data: FormResponse[],
   images: Image[],
   user: User,
@@ -164,6 +160,7 @@ const saveImageToRepo = async (
 
   const totalDays = data.length
   const workdayQualityQuestion = questionMap["workday_quality"]
+  const emotionQuestion = questionMap["emotions"]
   const averageScore =
     data
       .map(
@@ -198,32 +195,46 @@ const saveImageToRepo = async (
 
   ☀️ **${numberOfGoodDays}** were Good days (${d3.format(".0%")(
     numberOfGoodDays / totalDays
-  )}). *These are days you rated as Awesome or Good*
+  )}). <br />*These are days you rated as Awesome or Good*
 
   🌧 **${numberOfBadDays}** were Not-so-good days (${d3.format(".0%")(
     numberOfBadDays / totalDays
-  )}). *These are days you rated as OK, Bad, or Terrible*
+  )}). <br />*These are days you rated as OK, Bad, or Terrible*
 
-  On average, your workdays were ${averageScoreString}.
+  On average, your workdays were *${averageScoreString}*.
 
   Let's take a look at the data you logged for this week.
 
-  ## Do you have a typical time of day that feels productive?
+  ## What did your good and not-so-good days look like?
 
-  First, let's look at which parts of the day you were most and least productive. If there's a clear pattern, could you optimize your schedule to work with your natural productivity?
+  First, let's look at how you responded to each question over the week.
+
+  Is there any relationship to how you answered the first *How was your workday* question? We show how you reported the quality of your workday and how you felt about it at the top - see if there are any patterns on the Good days that you can control.
+
+  As a reminder, the quality question options were:
+
+  ${workdayQualityQuestion.optionsWithEmoji.map((d) => `${d}`).join("\n\n")}
+
+  and the responses to *How did you feel about your workday* question were:
+
+  ${emotionQuestion.optionsWithEmoji.map((d) => `${d}`).join("\n\n")}
 
   ![Image](${images[0].filename})
 
-  ## How you answered each question
 
-  Let's look at how you responeded to each question over the week.
+  ## Do you have a typical time of day that feels productive?
 
-  Is there any relationship to how you answered the first *How was your workday* question? We colored the background of each day with your response - red for not-so-good days and green for great days.
+  Let's look at which parts of the day you were most and least productive. If there's a clear pattern, could you optimize your schedule to work with your natural productivity?
 
   ${images
     .slice(1)
     .map(({ filename }) => `![Image](${filename})`)
     .join("\n")}
+
+
+  ---
+
+  If you would like to dig into your data, you can find all of it in the [good-day.csv](./good-day.csv) file.
   `
 
   const readmeContentsBuffer = Buffer.from(readmeContents)
@@ -276,7 +287,7 @@ const createChartsForUser = async (user: User): Promise<void> | null => {
   }
 
   const images = await createCharts(thisWeeksData, startOfWeek, endOfWeek)
-  await saveImageToRepo(thisWeeksData, images, user, startOfWeek)
+  await saveImagesToRepo(thisWeeksData, images, user, startOfWeek)
   await notifyUser(user)
 }
 
@@ -292,7 +303,8 @@ const createChartsForUsers: AzureFunction = async function (
 
   context.log("Charts generation function ran!", timeStamp)
 
-  const usersQuery = `SELECT * FROM users`
+  // const usersQuery = `SELECT * FROM users`
+  const usersQuery = `SELECT * FROM users WHERE slackid='U01QFBW14BY'`
 
   try {
     const { rows: users = [] } = await pool.query(usersQuery)
