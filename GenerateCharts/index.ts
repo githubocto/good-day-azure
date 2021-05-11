@@ -303,8 +303,7 @@ const createChartsForUsers: AzureFunction = async function (
 
   context.log("Charts generation function ran!", timeStamp)
 
-  // const usersQuery = `SELECT * FROM users`
-  const usersQuery = `SELECT * FROM users WHERE slackid='U01QFBW14BY'`
+  const usersQuery = `SELECT * FROM users`
 
   try {
     const { rows: users = [] } = await pool.query(usersQuery)
