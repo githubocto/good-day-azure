@@ -18,7 +18,9 @@ Good Day is a Slack bot that pings users every day and asks how their day was. I
     "FUNCTIONS_WORKER_RUNTIME": "node",
     "GH_API_KEY": "YOUR PAT GOES HERE", // get from good-day-bot account on GitHub
     "PG_CONN_STRING": "", // get from 1 password using table goodday
-    "SLACKBOT_API_URL": "https://octo-devex.ngrok.io" or "https://octo-good-day-bot.azurewebsites.net/"
+    "SLACKBOT_API_URL": "https://octo-devex.ngrok.io" or "https://octo-good-day-bot.azurewebsites.net/",
+    "AZURE_FUNCTIONS_ID": "", // API Key ID for slack server
+    "AZURE_FUNCTIONS_SECRET": "" // API Key secret for slack server
   }
 }
 ```

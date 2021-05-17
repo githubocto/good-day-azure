@@ -251,11 +251,19 @@ const saveImagesToRepo = async (
   })
 }
 
+// Generate credentials for slack server
+const encodedData = Buffer.from(`${process.env.AZURE_FUNCTIONS_ID}:${process.env.AZURE_FUNCTIONS_SECRET}`).toString('base64');
+const authorizationHeader = 'Basic: ' + encodedData;
+
 const notifyUser = async (user: User) => {
   console.log("Notifying", user.slackid)
   axios.post(`${SLACKBOT_API_URL}/notify-summary`, {
     user_id: user.slackid,
-  })
+  }, { 
+    headers: { 
+      Authorization: authorizationHeader 
+    } 
+  });
 }
 
 const convertDateToTimezone = (date, timezone: string) =>
