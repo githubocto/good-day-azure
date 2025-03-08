@@ -13,9 +13,9 @@
   "dependencies": {
     "@azure/functions": "^1.2.3",
     "@octokit/rest": "^18.5.3",
-    "@slack/bolt": "^3.3.0",
+    "@slack/bolt": "^3.22.0",
     "@types/node": "^15.0.1",
-    "axios": "^0.21.1",
+    "axios": "^1.8.2",
     "canvas": "^2.7.0",
     "chart.js": "^3.2.1",
     "d3": "^6.7.0",
